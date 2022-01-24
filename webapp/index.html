@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="form">
+      <form>
+        <input type="text" name="name" placeholder="name" />
+        <input type="email" name="email" placeholder="email" />
+        <input type="password" name="password" placeholder="password" />
+        <button type="button" onclick="submitForm()">Submit</button>
+      </form>
+    </div>
+    <pre class="users"></pre>
+
+    <script>
+      let users = [];
+      fetchUsers();
+      async function fetchUsers() {
+        try {
+          const res = await fetch("http://localhost:8080/users");
+          const data = await res.json();
+          console.log(data);
+          document.querySelector(".users").innerHTML = JSON.stringify(
+            data,
+            undefined,
+            4
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function submitForm(e) {
+        try {
+          const body = {
+            name: document.querySelector("input[name=name]").value,
+            email: document.querySelector("input[name=email]").value,
+            password: document.querySelector("input[name=password]").value,
+          };
+
+          const res = await fetch("http://localhost:8080/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          fetchUsers();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    </script>
+  </body>
+</html>
