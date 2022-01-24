@@ -6,6 +6,7 @@ import com.dev.rest.dao.UserDao;
 import com.dev.rest.models.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers() {
-        return userDao.findAll();
+        return userDao.findAll(Sort.by(Sort.Direction.DESC,"id"));
     }
 
     @Override
