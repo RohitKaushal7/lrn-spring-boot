@@ -1,1 +1,25 @@
-GET https://www.google.com
+GET http://localhost:8080/parking/dim
+
+###
+GET http://localhost:8080/parking/space
+
+###
+GET http://localhost:8080/parking/wq
+
+###
+POST http://localhost:8080/parking/park
+content-type: application/json
+
+{
+    "id": 2,
+    "size": 1
+}
+
+###
+POST http://localhost:8080/parking/unpark
+content-type: application/json
+
+{
+    "id": 1,
+    "size": 3
+}

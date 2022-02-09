@@ -20,6 +20,7 @@ public class RestApplication {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/users").allowedOrigins("*");
 				registry.addMapping("/adduser").allowedOrigins("*");
+				registry.addMapping("/parking/**").allowedOrigins("*");
 			}
 		};
 	}

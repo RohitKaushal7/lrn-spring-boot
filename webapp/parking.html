@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./parking.css" />
+    <title>Parking</title>
+  </head>
+  <body>
+    <main>
+      <div class="left">
+        <div class="form">
+          <form>
+            <input type="number" name="id" placeholder="Car ID" />
+            <input type="number" name="size" placeholder="Car Size" />
+            <button type="button" onclick="submitPark()">Park</button>
+            <button type="button" onclick="submitUnpark()">UnPark</button>
+          </form>
+        </div>
+        <h3>Parking Dimetion</h3>
+        <pre class="dim"></pre>
+        <h3>Parking Space</h3>
+        <pre class="space"></pre>
+        <h3>Waiting Queue</h3>
+        <pre class="wq"></pre>
+      </div>
+      <div class="right">
+        <div class="canvas"></div>
+      </div>
+    </main>
+
+    <script>
+      // STATE
+      let space = {};
+      let wq = [];
+      let dim = {};
+
+      const colors = [
+        "red",
+        "skyblue",
+        "green",
+        "pink",
+        "yellow",
+        "orange",
+        "cyan",
+        "violet",
+        "maroon",
+        "#565434",
+      ];
+
+      // EFFECTS
+      fetchSpace();
+      fetchDim();
+      fetchQ();
+
+      // RENDER
+
+      // FUNCTIONS
+
+      function render() {
+        document.querySelector(".space").innerHTML = JSON.stringify(
+          space,
+          undefined,
+          4
+        );
+        document.querySelector(".dim").innerHTML = JSON.stringify(
+          dim,
+          undefined,
+          4
+        );
+        document.querySelector(".wq").innerHTML = JSON.stringify(
+          wq,
+          undefined,
+          4
+        );
+
+        if (!space || !dim) return;
+        const $canvas = document.querySelector(".canvas");
+        $canvas.innerHTML = "";
+        const h1 = document.createElement("h3");
+        h1.innerHTML = "Parking";
+        $canvas.appendChild(h1);
+        for (const k in dim) {
+          const $pk = document.createElement("div");
+          $pk.classList.add("pk");
+          for (let i = 0; i < dim[k]; ++i) {
+            const $sp = document.createElement("div");
+            $sp.classList.add("sp");
+            $sp.style.width = 15 * Number(k) + "px";
+            $sp.style.height = 15 * Number(k) + "px";
+            if (space[k][i]) {
+              const car = space[k][i];
+              const $car = document.createElement("div");
+              $car.classList.add("car");
+              $car.style.width = 15 * Number(car.size) + "px";
+              $car.style.height = 15 * Number(car.size) + "px";
+              $car.style.background = colors[car.id % colors.length];
+              $car.innerHTML = car.id;
+              $sp.appendChild($car);
+            }
+            $pk.appendChild($sp);
+          }
+          $canvas.appendChild($pk);
+        }
+
+        // wait q
+        const h2 = document.createElement("h4");
+        h2.innerHTML = "Waiting Queue";
+        $canvas.appendChild(h2);
+        const $wq = document.createElement("div");
+        $wq.classList.add("wq");
+        for (const car of wq) {
+          const $car = document.createElement("div");
+          $car.classList.add("car");
+          $car.style.width = 15 * Number(car.size) + "px";
+          $car.style.height = 15 * Number(car.size) + "px";
+          $car.style.background = colors[car.id % colors.length];
+          $car.innerHTML = car.id;
+          $wq.appendChild($car);
+        }
+        $canvas.appendChild($wq);
+      }
+
+      // API
+      async function fetchSpace(data) {
+        if (data) {
+          document.querySelector(".space").innerHTML = JSON.stringify(
+            data,
+            undefined,
+            4
+          );
+          space = data;
+          console.log(data);
+          render();
+          return;
+        }
+        try {
+          const res = await fetch("http://localhost:8080/parking/space");
+          const data = await res.json();
+          console.log(data);
+          space = data;
+          render();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      async function fetchDim() {
+        try {
+          const res = await fetch("http://localhost:8080/parking/dim");
+          const data = await res.json();
+          console.log(data);
+          dim = data;
+          render();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      async function fetchQ() {
+        try {
+          const res = await fetch("http://localhost:8080/parking/wq");
+          const data = await res.json();
+          console.log(data);
+          wq = data;
+          render();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function submitPark(e) {
+        try {
+          const body = {
+            id: document.querySelector("input[name=id]").value,
+            size: document.querySelector("input[name=size]").value,
+          };
+
+          const res = await fetch("http://localhost:8080/parking/park", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          const data = await res.json();
+          document.querySelector("input[name=id]").value = Number(body.id) + 1;
+          fetchSpace(data);
+          fetchQ();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function submitUnpark(e) {
+        try {
+          const body = {
+            id: document.querySelector("input[name=id]").value,
+            size: document.querySelector("input[name=size]").value,
+          };
+
+          const res = await fetch("http://localhost:8080/parking/unpark", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          const data = await res.json();
+          document.querySelector("input[name=id]").value = Number(body.id) + 1;
+          fetchSpace(data);
+          fetchQ();
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    </script>
+  </body>
+</html>
